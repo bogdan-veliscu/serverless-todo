@@ -2,10 +2,10 @@ version = 0.1
 [default]
 [default.deploy]
 [default.deploy.parameters]
-stack_name = "todo-stack"
+stack_name = "todo-app"
 s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ybf9caubthxs"
-s3_prefix = "todo-stack"
+s3_prefix = "todo-app"
 region = "eu-west-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "VersionParam=\"v1\" StageNameParam=\"prod\" CognitoDomainName=\"todo-demo\" Repository=\"\" Branch=\"master\""
+parameter_overrides = "VersionParam=\"v1\" StageNameParam=\"prod\" CognitoDomainName=\"todo-demo\" LogLevel=\"INFO\" Repository=\"https://github.com/bogdan-veliscu/serverless-todo\" Branch=\"master\" OauthToken=\"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\""

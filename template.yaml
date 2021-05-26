@@ -5,34 +5,6 @@ Description: >
 
   Sample SAM Template for todo-app
 
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
-  Function:
-    Runtime: python3.8
-    Timeout: 3
-    Tracing: Active
-    Handler: app.handler
-    Environment:
-      Variables:
-        ENVIRONMENT: !Ref Environment
-        POWERTOOLS_SERVICE_NAME: delivery-pricing
-        POWERTOOLS_TRACE_DISABLED: "false"
-        LOG_LEVEL: !Ref LogLevel
-
-Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
-    Properties:
-      CodeUri: hello_world/
-      Handler: app.handler
-      Runtime: python3.8
-      Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-          Properties:
-            Path: /hello
-            Method: get
-
 Parameters:
   VersionParam:
     Type: String
@@ -43,6 +15,9 @@ Parameters:
   CognitoDomainName:
     Type: String
     Default: todo-demo
+  LogLevel:
+    Type: String
+    Default: INFO
 
   # Amplify console
   Repository:
@@ -57,25 +32,54 @@ Parameters:
     Description: GitHub Token
     NoEcho: true
 
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Runtime: python3.8
+    Timeout: 3
+    Tracing: Active
+    Handler: app.handler
+    Environment:
+      Variables:
+        ENVIRONMENT: !Ref StageNameParam
+        POWERTOOLS_SERVICE_NAME: delivery-pricing
+        POWERTOOLS_TRACE_DISABLED: "false"
+        LOG_LEVEL: !Ref LogLevel
+  Api:
+    Auth:
+      UsagePlan:
+        UsagePlanName: DailyUsagePlan
+        CreateUsagePlan: PER_API
+        Description: This will limit 5000 executions per day and throttle executions on 10% of that.
+        Quota:
+          Limit: 5000
+          Period: DAY
+        Throttle:
+          BurstLimit: 100
+          RateLimit: 50
+
 Resources:
+
+#cognito declaration
   TodoUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
       AdminCreateUserConfig:
-        AllowAdinCreateUserOnly: false
+        AllowAdminCreateUserOnly: false
       UserPoolName: TodoUsers
-      UsernameAtributes:
-        - email
+      UsernameAttributes:
+      - email
       AutoVerifiedAttributes:
-        - email
+      - email
       Policies:
         PasswordPolicy:
           MinimumLength: 6
-          RequiredLowercase: true
-          RequiredNumbers: true
-          RequiredSymbols: false
-          RequiredUppercase: false
-
+          RequireLowercase: true
+          RequireNumbers: false
+          RequireSymbols: false
+          RequireUppercase: true
+  
   TodoUserPoolTokenClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
@@ -88,10 +92,10 @@ Resources:
       AllowedOAuthScopes: ['phone', 'email', 'openid']
       ExplicitAuthFlows:
       - USER_PASSWORD_AUTH
-
+  
   TodoDomain:
     Type: AWS::Cognito::UserPoolDomain
-    Properties:
+    Properties: 
       Domain: !Join ['-', [!Ref CognitoDomainName, !Ref AWS::StackName]]
       UserPoolId: !Ref TodoUserPool
 
@@ -100,15 +104,20 @@ Resources:
     Properties:
       TableName: !Join ['-', [todo-table, !Ref AWS::StackName]]
       KeySchema:
-        - AttributeName: cognito-username
-          KeyType: HASH
-        - AttributeName: id
-          KeyType: RANGE
+          - AttributeName: cognito-username
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
       AttributeDefinitions:
-        - AttributeName: cognito-username
-          AttributeType: S
-        - AttributeName: id
-          AttributeType: S
+          - AttributeName: cognito-username
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+      ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5                  
+      SSESpecification:
+        SSEEnabled: true
 
   # API declaration
   TodoApi:
