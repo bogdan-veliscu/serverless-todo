@@ -8,4 +8,4 @@ s3_prefix = "todo-app"
 region = "eu-west-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "VersionParam=\"v1\" StageNameParam=\"prod\" CognitoDomainName=\"todo-demo\" LogLevel=\"INFO\" Repository=\"https://github.com/bogdan-veliscu/serverless-todo\" Branch=\"master\" OauthToken=\"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\""
+parameter_overrides = "VersionParam=\"v1\" StageNameParam=\"prod\" CognitoDomainName=\"todo-demo\" LogLevel=\"INFO\" Repository=\"https://github.com/bogdan-veliscu/serverless-todo\" Branch=\"master\" "
