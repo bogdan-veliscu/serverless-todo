@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "todo-stack"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-ybf9caubthxs"
+s3_prefix = "todo-stack"
+region = "eu-west-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "VersionParam=\"v1\" StageNameParam=\"prod\" CognitoDomainName=\"todo-demo\" Repository=\"\" Branch=\"master\""
